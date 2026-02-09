@@ -1,617 +1,608 @@
-{\rtf1\ansi\ansicpg932\cocoartf2822
-\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-{\*\expandedcolortbl;;}
-\paperw11900\paperh16840\margl1440\margr1440\vieww29200\viewh16000\viewkind0
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Blue Deer's Evolution Run</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@800&family=Outfit:wght@900&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; overflow: hidden; background: #4facfe; font-family: 'M PLUS Rounded 1c', sans-serif; touch-action: manipulation; }
+        canvas { display: block; margin: 0 auto; background: linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%); cursor: pointer; }
+        #ui-overlay {
+            position: absolute;
+            top: 15px;
+            left: 0;
+            width: 100%;
+            pointer-events: none;
+            display: flex;
+            justify-content: space-around;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-size: 22px;
+            z-index: 10;
+        }
+        #level-indicator {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.5);
+            padding: 8px 20px;
+            border-radius: 30px;
+            color: #fff;
+            font-weight: bold;
+            backdrop-filter: blur(5px);
+            border: 2px solid rgba(255,255,255,0.3);
+            pointer-events: none;
+        }
+        #level-up-banner {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: rgba(255, 255, 255, 0.9);
+            color: #ff4757;
+            padding: 20px 60px;
+            border-radius: 50px;
+            font-size: 40px;
+            font-weight: 900;
+            z-index: 50;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            pointer-events: none;
+        }
+        #game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.98);
+            padding: 40px;
+            text-align: center;
+            display: none;
+            border-radius: 40px;
+            z-index: 100;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            border: 8px solid #ff4757;
+        }
+        #jump-button {
+            position: absolute;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 160px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.35);
+            border: 3px solid rgba(255, 255, 255, 0.7);
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            backdrop-filter: blur(8px);
+            z-index: 20;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: background 0.2s;
+        }
+        #jump-button:active {
+            transform: translateX(-50%) scale(0.92);
+            background: rgba(255, 255, 255, 0.5);
+        }
+        .btn-retry {
+            background: linear-gradient(to bottom, #ff4757, #ff6b6b);
+            border: none;
+            padding: 15px 40px;
+            color: #fff;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 50px;
+            box-shadow: 0 6px 0 #b33939;
+            transition: all 0.1s;
+            margin-top: 20px;
+            width: 100%;
+        }
+        .btn-retry:active { transform: translateY(4px); box-shadow: 0 2px 0 #b33939; }
+    </style>
+</head>
+<body>
 
-\f0\fs24 \cf0 <!DOCTYPE html>\
-<html lang="ja">\
-<head>\
-    <meta charset="UTF-8">\
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">\
-    <title>Blue Deer's Evolution Run</title>\
-    <script src="https://cdn.tailwindcss.com"></script>\
-    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@800&family=Outfit:wght@900&display=swap" rel="stylesheet">\
-    <style>\
-        body \{ margin: 0; overflow: hidden; background: #4facfe; font-family: 'M PLUS Rounded 1c', sans-serif; touch-action: manipulation; \}\
-        canvas \{ display: block; margin: 0 auto; background: linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%); cursor: pointer; \}\
-        #ui-overlay \{\
-            position: absolute;\
-            top: 15px;\
-            left: 0;\
-            width: 100%;\
-            pointer-events: none;\
-            display: flex;\
-            justify-content: space-around;\
-            color: #fff;\
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);\
-            font-size: 22px;\
-            z-index: 10;\
-        \}\
-        #level-indicator \{\
-            position: absolute;\
-            bottom: 20px;\
-            right: 20px;\
-            background: rgba(0,0,0,0.5);\
-            padding: 8px 20px;\
-            border-radius: 30px;\
-            color: #fff;\
-            font-weight: bold;\
-            backdrop-filter: blur(5px);\
-            border: 2px solid rgba(255,255,255,0.3);\
-            pointer-events: none;\
-        \}\
-        #level-up-banner \{\
-            position: absolute;\
-            top: 40%;\
-            left: 50%;\
-            transform: translate(-50%, -50%) scale(0);\
-            background: rgba(255, 255, 255, 0.9);\
-            color: #ff4757;\
-            padding: 20px 60px;\
-            border-radius: 50px;\
-            font-size: 40px;\
-            font-weight: 900;\
-            z-index: 50;\
-            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);\
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);\
-            pointer-events: none;\
-        \}\
-        #game-over \{\
-            position: absolute;\
-            top: 50%;\
-            left: 50%;\
-            transform: translate(-50%, -50%);\
-            background: rgba(255, 255, 255, 0.98);\
-            padding: 40px;\
-            text-align: center;\
-            display: none;\
-            border-radius: 40px;\
-            z-index: 100;\
-            width: 90%;\
-            max-width: 400px;\
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);\
-            border: 8px solid #ff4757;\
-        \}\
-        #jump-button \{\
-            position: absolute;\
-            bottom: 25px;\
-            left: 50%;\
-            transform: translateX(-50%);\
-            width: 160px;\
-            height: 60px;\
-            background: rgba(255, 255, 255, 0.35);\
-            border: 3px solid rgba(255, 255, 255, 0.7);\
-            border-radius: 40px;\
-            display: flex;\
-            align-items: center;\
-            justify-content: center;\
-            color: white;\
-            font-size: 18px;\
-            font-weight: 900;\
-            letter-spacing: 2px;\
-            backdrop-filter: blur(8px);\
-            z-index: 20;\
-            user-select: none;\
-            -webkit-tap-highlight-color: transparent;\
-            cursor: pointer;\
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);\
-            transition: background 0.2s;\
-        \}\
-        #jump-button:active \{\
-            transform: translateX(-50%) scale(0.92);\
-            background: rgba(255, 255, 255, 0.5);\
-        \}\
-        .btn-retry \{\
-            background: linear-gradient(to bottom, #ff4757, #ff6b6b);\
-            border: none;\
-            padding: 15px 40px;\
-            color: #fff;\
-            font-size: 24px;\
-            font-weight: bold;\
-            cursor: pointer;\
-            border-radius: 50px;\
-            box-shadow: 0 6px 0 #b33939;\
-            transition: all 0.1s;\
-            margin-top: 20px;\
-            width: 100%;\
-        \}\
-        .btn-retry:active \{ transform: translateY(4px); box-shadow: 0 2px 0 #b33939; \}\
-    </style>\
-</head>\
-<body>\
-\
-    <div id="ui-overlay">\
-        <div>SCORE: <span id="score" class="font-bold">0</span></div>\
-        <div>BEST: <span id="hi-score" class="opacity-80">0</span></div>\
-        <div>DIST: <span id="dist">0</span>m</div>\
-    </div>\
-\
-    <div id="jump-button">JUMP</div>\
-\
-    <div id="level-up-banner">LEVEL UP!</div>\
-    <div id="level-indicator">LEVEL: <span id="current-level">1</span></div>\
-\
-    <div id="game-over">\
-        <h1 style="font-size: 36px; color: #ff4757; margin-bottom: 10px; font-weight: 900;">GAME OVER</h1>\
-        <p id="death-reason" style="font-size: 18px; color: #555; margin-bottom: 20px;"></p>\
-        <div style="background: #f1f2f6; padding: 20px; border-radius: 20px; margin-bottom: 10px;">\
-            <p style="font-size: 20px; margin: 0; color: #2f3542;">\uc0\u20170 \u22238 \u12398 \u12473 \u12467 \u12450 </p>\
-            <p id="final-score" style="font-size: 42px; font-weight:900; color:#ff9f43; margin: 5px 0;">0</p>\
-        </div>\
-        <button class="btn-retry" onclick="resetGame()">\uc0\u12418 \u12358 \u12356 \u12385 \u12393 \u25361 \u25126 \u65281 </button>\
-    </div>\
-\
-    <canvas id="gameCanvas"></canvas>\
-\
-    <script>\
-        const canvas = document.getElementById('gameCanvas');\
-        const ctx = canvas.getContext('2d');\
-        const scoreEl = document.getElementById('score');\
-        const hiScoreEl = document.getElementById('hi-score');\
-        const distEl = document.getElementById('dist');\
-        const levelEl = document.getElementById('current-level');\
-        const gameOverEl = document.getElementById('game-over');\
-        const finalScoreEl = document.getElementById('final-score');\
-        const deathReasonEl = document.getElementById('death-reason');\
-        const levelBanner = document.getElementById('level-up-banner');\
-        const jumpBtn = document.getElementById('jump-button');\
-\
-        const GRAVITY = 0.6;\
-        const JUMP_FORCE = -12.5;\
-        const BASE_SCROLL_SPEED = 6.5; // \uc0\u21021 \u36895 \u12434 \u23569 \u12375 \u12450 \u12483 \u12503  (6.0 -> 6.5)\
-        const CANVAS_WIDTH = 800;\
-        const CANVAS_HEIGHT = 450;\
-        const GROUND_Y = CANVAS_HEIGHT - 65;\
-\
-        canvas.width = CANVAS_WIDTH;\
-        canvas.height = CANVAS_HEIGHT;\
-\
-        let gameState = 'playing';\
-        let score = 0;\
-        let distance = 0;\
-        let frames = 0;\
-        let level = 1;\
-        let currentScrollSpeed = BASE_SCROLL_SPEED;\
-        let hiScore = localStorage.getItem('deer_hiscore_v6') || 0;\
-        hiScoreEl.innerText = hiScore;\
-\
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();\
-        let bgmInterval;\
-        let bgmTempo = 250; \
-\
-        function playNote(freq, dur, vol = 0.05, type = 'triangle') \{\
-            if (audioCtx.state === 'suspended') audioCtx.resume();\
-            const osc = audioCtx.createOscillator();\
-            const gain = audioCtx.createGain();\
-            osc.type = type;\
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);\
-            gain.gain.setValueAtTime(vol, audioCtx.currentTime);\
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);\
-            osc.connect(gain);\
-            gain.connect(audioCtx.destination);\
-            osc.start();\
-            osc.stop(audioCtx.currentTime + dur);\
-        \}\
-\
-        const melody = [261.63, 293.66, 329.63, 349.23, 392.00, 329.63, 261.63, 392.00];\
-        let noteIndex = 0;\
-\
-        function startBgm() \{\
-            if (bgmInterval) clearInterval(bgmInterval);\
-            bgmInterval = setInterval(() => \{\
-                if (gameState === 'playing') \{\
-                    playNote(melody[noteIndex % melody.length], 0.2, 0.03);\
-                    if (noteIndex % 4 === 0) playNote(130.81, 0.1, 0.02, 'square'); \
-                    noteIndex++;\
-                \}\
-            \}, bgmTempo);\
-        \}\
-\
-        function playSfx(freq, type, dur, vol = 0.1, slide = 0) \{\
-            if (audioCtx.state === 'suspended') audioCtx.resume();\
-            const osc = audioCtx.createOscillator();\
-            const gain = audioCtx.createGain();\
-            osc.type = type;\
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);\
-            if (slide) osc.frequency.exponentialRampToValueAtTime(freq + slide, audioCtx.currentTime + dur);\
-            gain.gain.setValueAtTime(vol, audioCtx.currentTime);\
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);\
-            osc.connect(gain);\
-            gain.connect(audioCtx.destination);\
-            osc.start();\
-            osc.stop(audioCtx.currentTime + dur);\
-        \}\
-\
-        class Particle \{\
-            constructor(x, y, color) \{\
-                this.x = x; this.y = y; this.vx = (Math.random()-0.5)*10; this.vy = (Math.random()-0.5)*10;\
-                this.life = 1.0; this.color = color; this.size = Math.random()*5+2;\
-            \}\
-            update() \{ this.x += this.vx; this.y += this.vy; this.life -= 0.03; \}\
-            draw() \{\
-                ctx.save(); ctx.globalAlpha = this.life; ctx.fillStyle = this.color;\
-                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill(); ctx.restore();\
-            \}\
-        \}\
-\
-        class ItemPopup \{\
-            constructor(x, y, type, points) \{\
-                this.x = x; this.y = y; this.type = type; this.points = points;\
-                this.vy = -6; this.life = 1.0;\
-                this.icons = \{ candy: '\uc0\u55356 \u57196 ', drink: '\u55358 \u56676 ', cake: '\u55356 \u57200 ' \};\
-            \}\
-            update() \{ this.y += this.vy; this.vy += 0.25; this.life -= 0.015; \}\
-            draw() \{\
-                ctx.save(); ctx.globalAlpha = this.life;\
-                ctx.font = '40px Arial';\
-                ctx.textAlign = 'center'; \
-                ctx.fillText(this.icons[this.type], this.x, this.y);\
-                ctx.font = 'bold 24px Outfit';\
-                ctx.fillStyle = '#ff9f43';\
-                ctx.strokeStyle = '#fff';\
-                ctx.lineWidth = 3;\
-                ctx.strokeText(`+$\{this.points\}`, this.x, this.y - 45);\
-                ctx.fillText(`+$\{this.points\}`, this.x, this.y - 45);\
-                ctx.restore();\
-            \}\
-        \}\
-\
-        class Platform \{\
-            constructor(x, w) \{ this.x = x; this.w = w; \}\
-            draw() \{\
-                const grad = ctx.createLinearGradient(this.x, GROUND_Y, this.x, GROUND_Y+65);\
-                grad.addColorStop(0, '#2ecc71'); grad.addColorStop(1, '#1e8449');\
-                ctx.fillStyle = grad;\
-                ctx.beginPath(); ctx.roundRect(this.x, GROUND_Y, this.w, 100, [10, 10, 0, 0]); ctx.fill();\
-                ctx.fillStyle = 'rgba(0,0,0,0.05)';\
-                for(let i=0; i<this.w; i+=40) ctx.fillRect(this.x+i, GROUND_Y, 20, 5);\
-            \}\
-        \}\
-\
-        class Enemy \{\
-            constructor(x, type, scale = 1.0, levelAtSpawn = 1) \{\
-                this.x = x; this.type = type; this.scale = scale;\
-                this.w = 45 * scale; this.h = 45 * scale;\
-                this.startY = GROUND_Y - this.h - 5; this.y = this.startY;\
-                this.angle = 0; this.seed = Math.random() * 100;\
-                this.color = this.getColorByLevel(levelAtSpawn);\
-            \}\
-\
-            getColorByLevel(lv) \{\
-                const colors = ['#ff4757', '#ffa502', '#eccc68', '#2ed573', '#1e90ff', '#a55eea', '#2f3542'];\
-                return colors[Math.min(lv - 1, colors.length - 1)];\
-            \}\
-\
-            update() \{\
-                this.x -= currentScrollSpeed;\
-                this.angle += 0.12;\
-\
-                if (this.type === 'horizontal') \{\
-                    this.x -= 3.0;\
-                \} else if (this.type === 'vertical') \{\
-                    this.y = this.startY + Math.sin(this.angle) * 80;\
-                \} else if (this.type === 'diagonal') \{\
-                    this.y = this.startY + Math.sin(this.angle) * 90;\
-                    this.x -= 2.5;\
-                \} else if (this.type === 'random') \{\
-                    this.y = this.startY + Math.sin(this.angle + this.seed) * 110;\
-                    this.x -= (Math.sin(this.angle * 0.5) * 4.0);\
-                \}\
-            \}\
-            draw() \{\
-                ctx.save(); ctx.translate(this.x + this.w/2, this.y + this.h/2);\
-                ctx.fillStyle = this.color;\
-                ctx.beginPath(); ctx.arc(0, 0, this.w/2, 0, Math.PI*2); ctx.fill();\
-                ctx.strokeStyle = this.color; ctx.lineWidth = 4 * this.scale;\
-                for(let i=0; i<8; i++) \{\
-                    const a = (this.angle * 0.6) + (i * Math.PI/4);\
-                    ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(Math.cos(a)*(this.w/2+10), Math.sin(a)*(this.w/2+10)); ctx.stroke();\
-                \}\
-                ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(-7*this.scale, -5*this.scale, 8*this.scale, 0, Math.PI*2); ctx.fill();\
-                ctx.beginPath(); ctx.arc(7*this.scale, -5*this.scale, 8*this.scale, 0, Math.PI*2); ctx.fill();\
-                ctx.fillStyle = '#000'; const eyeX = Math.cos(this.angle)*2;\
-                ctx.beginPath(); ctx.arc((-7+eyeX)*this.scale, -5*this.scale, 4*this.scale, 0, Math.PI*2); ctx.fill();\
-                ctx.beginPath(); ctx.arc((7+eyeX)*this.scale, -5*this.scale, 4*this.scale, 0, Math.PI*2); ctx.fill();\
-                ctx.restore();\
-            \}\
-        \}\
-\
-        class Obstacle \{\
-            constructor(x) \{\
-                this.x = x; this.w = 50; this.h = 60; this.y = GROUND_Y - this.h;\
-                this.type = Math.random() > 0.5 ? 'cactus' : 'rock';\
-            \}\
-            update() \{ this.x -= currentScrollSpeed; \}\
-            draw() \{\
-                ctx.save(); ctx.translate(this.x, this.y);\
-                if (this.type === 'cactus') \{\
-                    ctx.fillStyle = '#27ae60';\
-                    ctx.beginPath(); ctx.roundRect(15, 0, 20, 60, 10); ctx.fill();\
-                    ctx.beginPath(); ctx.roundRect(0, 20, 15, 10, 5); ctx.fill();\
-                    ctx.beginPath(); ctx.roundRect(35, 15, 15, 10, 5); ctx.fill();\
-                \} else \{\
-                    ctx.fillStyle = '#7f8c8d';\
-                    ctx.beginPath(); ctx.moveTo(0, 60); ctx.lineTo(10, 10); ctx.lineTo(25, 0); ctx.lineTo(40, 20); ctx.lineTo(50, 60); ctx.closePath(); ctx.fill();\
-                \}\
-                ctx.restore();\
-            \}\
-        \}\
-\
-        class Coin \{\
-            constructor(x, y) \{ this.x = x; this.y = y; this.collected = false; this.anim = 0; \}\
-            update() \{ this.x -= currentScrollSpeed; this.anim += 0.15; \}\
-            draw() \{\
-                if (this.collected) return;\
-                ctx.save(); ctx.translate(this.x, this.y + Math.sin(this.anim)*6);\
-                ctx.scale(Math.cos(this.anim), 1);\
-                ctx.fillStyle = '#f1c40f'; ctx.beginPath(); ctx.arc(0, 0, 15, 0, Math.PI*2); ctx.fill();\
-                ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();\
-                ctx.fillStyle = '#d4ac0d'; ctx.font = 'bold 18px Arial'; ctx.textAlign = 'center'; ctx.fillText('$', 0, 7);\
-                ctx.restore();\
-            \}\
-        \}\
-\
-        class Box \{\
-            constructor(x, y) \{ this.x = x; this.y = y; this.w = 48; this.h = 48; this.isUsed = false; this.anim = 0; \}\
-            update() \{ this.x -= currentScrollSpeed; if (this.anim < 0) this.anim += 2; \}\
-            draw() \{\
-                ctx.save(); ctx.translate(this.x, this.y + this.anim);\
-                ctx.fillStyle = this.isUsed ? '#bdc3c7' : '#f1c40f';\
-                ctx.beginPath(); ctx.roundRect(0, 0, 48, 48, 10); ctx.fill();\
-                ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.stroke();\
-                ctx.fillStyle = '#fff'; ctx.font = 'bold 30px Arial'; ctx.textAlign = 'center'; ctx.fillText(this.isUsed ? '\'d7' : '?', 24, 35);\
-                ctx.restore();\
-            \}\
-            hit() \{\
-                if (this.isUsed) return; this.isUsed = true; this.anim = -25;\
-                const r = Math.random();\
-                let points, type;\
-                if (r < 0.5) \{ points = 200; type = 'candy'; \}\
-                else if (r < 0.8) \{ points = 300; type = 'drink'; \}\
-                else \{ points = 500; type = 'cake'; \}\
-                score += points; scoreEl.innerText = score;\
-                popups.push(new ItemPopup(this.x + 24, this.y - 10, type, points));\
-                playSfx(880, 'square', 0.25, 0.1, 440);\
-                for(let i=0; i<20; i++) particles.push(new Particle(this.x+24, this.y+24, '#f1c40f'));\
-            \}\
-        \}\
-\
-        class DeerPlayer \{\
-            constructor() \{\
-                this.startPosX = 60;\
-                this.x = this.startPosX; this.y = GROUND_Y - 110; \
-                this.w = 55; this.h = 100; \
-                this.dy = 0; this.jumpCount = 0; this.tilt = 0; this.walkCycle = 0;\
-                this.headSize = 55;\
-            \}\
-            draw() \{\
-                ctx.save();\
-                const bounce = Math.abs(Math.sin(this.walkCycle)) * 4; \
-                ctx.translate(this.x + this.w/2, this.y + this.h/2 - bounce);\
-                ctx.rotate(this.tilt);\
-                const legMovement = Math.sin(this.walkCycle) * 18;\
-                const armMovement = Math.sin(this.walkCycle) * 14;\
-                ctx.strokeStyle = '#f5f6fa'; ctx.lineWidth = 4; ctx.lineCap = 'round';\
-                ctx.beginPath(); ctx.moveTo(-12, -35); ctx.quadraticCurveTo(-35, -55, -25, -85); ctx.moveTo(-24, -50); ctx.lineTo(-42, -65); ctx.moveTo(-28, -65); ctx.lineTo(-12, -75); ctx.stroke();\
-                ctx.beginPath(); ctx.moveTo(12, -35); ctx.quadraticCurveTo(35, -55, 25, -85); ctx.moveTo(24, -50); ctx.lineTo(42, -65); ctx.moveTo(28, -65); ctx.lineTo(12, -75); ctx.stroke();\
-                ctx.fillStyle = '#74b9ff'; ctx.strokeStyle = '#000'; ctx.lineWidth = 2.5;\
-                ctx.beginPath(); ctx.roundRect(-18 + legMovement * 0.5, 25 + legMovement, 12, 20, 6); ctx.fill(); ctx.stroke();\
-                ctx.beginPath(); ctx.roundRect(8 - legMovement * 0.5, 25 - legMovement, 12, 20, 6); ctx.fill(); ctx.stroke();\
-                ctx.beginPath(); ctx.roundRect(-18, 0, 36, 30, 15); ctx.fill(); ctx.stroke();\
-                ctx.beginPath(); ctx.ellipse(-15 - armMovement * 0.3, 15 + armMovement, 6, 12, 0.2, 0, Math.PI*2); ctx.fill(); ctx.stroke();\
-                ctx.beginPath(); ctx.ellipse(15 + armMovement * 0.3, 15 - armMovement, 6, 12, -0.2, 0, Math.PI*2); ctx.fill(); ctx.stroke();\
-                ctx.beginPath(); ctx.arc(-15, 20, 7, 0, Math.PI * 2); ctx.fill(); ctx.stroke();\
-                ctx.save(); ctx.translate(0, -25); ctx.beginPath(); ctx.roundRect(-this.headSize/2, -this.headSize/2, this.headSize, this.headSize, 22); ctx.fill(); ctx.stroke();\
-                ctx.save(); ctx.translate(-22, -22); ctx.rotate(0.3); ctx.beginPath(); ctx.ellipse(0, 0, 12, 7, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.moveTo(-5, 0); ctx.lineTo(5, 0); ctx.stroke(); ctx.restore();\
-                ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(20, 5, 18, 15, -Math.PI * 0.1, 0, Math.PI * 2); ctx.fill(); ctx.stroke();\
-                ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(32, 5, 5, 0, Math.PI * 2); ctx.fill();\
-                ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(-8, -5, 12, 0, Math.PI * 2); ctx.fill(); ctx.stroke();\
-                ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(-5, -5, 6, 0, Math.PI * 2); ctx.fill();\
-                ctx.restore(); ctx.restore(); \
-            \}\
-            update() \{\
-                this.dy += GRAVITY; this.y += this.dy;\
-                if (this.dy === 0) \{ this.walkCycle += 0.28; \} else \{ this.walkCycle += 0.05; \}\
-                this.tilt = this.dy * 0.04;\
-                if (this.x < this.startPosX) \{ this.x += 1.5; \}\
-\
-                platforms.forEach(p => \{\
-                    if (this.x + this.w > p.x && this.x < p.x + p.w && this.y + this.h > GROUND_Y && this.y + this.h - this.dy <= GROUND_Y + 20) \{\
-                        this.y = GROUND_Y - this.h; this.dy = 0; this.jumpCount = 0;\
-                    \}\
-                \});\
-\
-                boxes.forEach(b => \{\
-                    const boxLeft = b.x; const boxRight = b.x + b.w;\
-                    const boxTop = b.y; const boxBottom = b.y + b.h;\
-                    if (this.x + this.w > boxLeft && this.x < boxRight && this.y + this.h > boxTop && this.y < boxBottom) \{\
-                        if (this.dy > 0 && this.y + this.h - this.dy <= boxTop + 10) \{\
-                            this.y = boxTop - this.h; this.dy = 0; this.jumpCount = 0;\
-                        \} \
-                        else if (this.dy < 0 && this.y - this.dy >= boxBottom - 10) \{\
-                            this.y = boxBottom; this.dy = 2; b.hit();\
-                        \}\
-                        else \{\
-                            if (this.x + this.w - currentScrollSpeed <= boxLeft + 15) \{ this.x = boxLeft - this.w; \}\
-                            else if (this.x >= boxRight - 15) \{ this.x = boxRight; \}\
-                        \}\
-                    \}\
-                \});\
-\
-                obstacles.forEach(o => \{\
-                    if (this.x + this.w > o.x + 10 && this.x < o.x + o.w - 10 && this.y + this.h > o.y + 10 && this.y < o.y + o.h) \{\
-                        gameOver("\uc0\u12392 \u12370 \u12392 \u12370 \u12395  \u12373 \u12373 \u12387 \u12385 \u12419 \u12387 \u12383 \u65281 ");\
-                    \}\
-                \});\
-\
-                if (this.x < -10) \{ gameOver("\uc0\u12362 \u12375 \u12384 \u12373 \u12428 \u12390  \u30011 \u38754 \u12363 \u12425 \u12399 \u12415 \u12384 \u12375 \u12385 \u12419 \u12387 \u12383 \u65281 "); \}\
-                else if (this.x < 10) \{ this.x += 2; \}\
-                if (this.y > CANVAS_HEIGHT) gameOver("\uc0\u12354 \u12394 \u12395  \u12362 \u12387 \u12371 \u12385 \u12383 \u65281 ");\
-            \}\
-        \}\
-\
-        let player = new DeerPlayer();\
-        let platforms = [new Platform(0, 1000)];\
-        let enemies = []; let boxes = []; let coins = []; let particles = []; let popups = []; let obstacles = [];\
-        let clouds = Array.from(\{length: 6\}, () => (\{ x: Math.random()*900, y: 30+Math.random()*100, s: 0.8+Math.random() \}));\
-\
-        function spawn() \{\
-            if (frames % 70 === 0) \{ // \uc0\u12473 \u12509 \u12540 \u12531 \u38291 \u38548 \u12434 \u23569 \u12375 \u30701 \u32302  (80 -> 70)\
-                const last = platforms[platforms.length - 1];\
-                const gapProb = 0.5; // \uc0\u31348 \u12364 \u38283 \u12367 \u30906 \u29575 \u12434 \u24494 \u22679  (0.45 -> 0.5)\
-                const gapSize = Math.random() < gapProb ? (170 + Math.random() * (120 + level * 10)) : 0;\
-                const nextW = 400 + Math.random() * 350;\
-                const nextX = last.x + last.w + gapSize;\
-                platforms.push(new Platform(nextX, nextW));\
-\
-                if (gapSize === 0) \{\
-                    // \uc0\u25973 \u12398 \u20986 \u29694 \u29575 \u12434 \u22823 \u24133 \u12450 \u12483 \u12503  (0.5 -> 0.75)\
-                    if (Math.random() < 0.75) \{\
-                        let eType = 'static';\
-                        if (level === 2) eType = 'horizontal';\
-                        else if (level === 3) eType = 'vertical';\
-                        else if (level === 4) eType = 'diagonal';\
-                        else if (level === 5) eType = 'random';\
-                        else if (level >= 6) \{\
-                            const types = ['static', 'horizontal', 'vertical', 'diagonal', 'random'];\
-                            eType = types[Math.floor(Math.random() * types.length)];\
-                        \}\
-                        const enemyScale = 1.0 + Math.min(1.0, (level - 1) * 0.1); \
-                        enemies.push(new Enemy(nextX + 300, eType, enemyScale, level));\
-                    \} \
-                    // \uc0\u38556 \u23475 \u29289 \u12398 \u20986 \u29694 \u29575 \u12434 \u12450 \u12483 \u12503  (0.3 -> 0.45)\
-                    if (Math.random() < 0.45) \{\
-                        obstacles.push(new Obstacle(nextX + 150));\
-                    \}\
-                    // \uc0\u12450 \u12452 \u12486 \u12512 \u12508 \u12483 \u12463 \u12473 \u12398 \u20986 \u29694 \u29575 \u12434 \u12450 \u12483 \u12503  (0.4 -> 0.6)\
-                    if (Math.random() < 0.6) \{\
-                        boxes.push(new Box(nextX + 250, GROUND_Y - 180));\
-                    \}\
-                    // \uc0\u12467 \u12452 \u12531 \u12398 \u20986 \u29694 \u29575 \u12434 \u12450 \u12483 \u12503  (0.6 -> 0.8)\
-                    if (Math.random() < 0.8) \{\
-                        const count = 4 + Math.floor(Math.random()*5); // \uc0\u26522 \u25968 \u12418 \u24494 \u22679 \
-                        const startX = nextX + 100;\
-                        for(let i=0; i<count; i++) \{\
-                            coins.push(new Coin(startX + i*45, GROUND_Y - 120 - Math.sin(i*0.8)*40));\
-                        \}\
-                    \}\
-                \} else \{\
-                    // \uc0\u31348 \u12364 \u12354 \u12427 \u22580 \u21512 \u12391 \u12418 \u12289 \u31354 \u20013 \u12420 \u31471 \u12395 \u12467 \u12452 \u12531 \u12434 \u20986 \u12377 \u12424 \u12358 \u12395 \u12375 \u12390 \u35480 \u23566 \
-                    if (Math.random() < 0.7) \{\
-                        coins.push(new Coin(nextX - gapSize/2, GROUND_Y - 150));\
-                    \}\
-                \}\
-            \}\
-        \}\
-\
-        function triggerLevelUpEffect() \{\
-            levelBanner.style.transform = "translate(-50%, -50%) scale(1.2)";\
-            setTimeout(() => \{ levelBanner.style.transform = "translate(-50%, -50%) scale(0)"; \}, 1500);\
-            playSfx(659, 'sine', 0.5, 0.1, 330);\
-            bgmTempo = Math.max(100, 250 - (level - 1) * 15);\
-            startBgm(); \
-        \}\
-\
-        function update() \{\
-            if (gameState !== 'playing') return;\
-            frames++; distance = Math.floor(frames / 8); distEl.innerText = distance;\
-\
-            const newLevel = Math.floor(score / 5000) + 1;\
-            if (newLevel !== level) \{\
-                level = newLevel; levelEl.innerText = level;\
-                currentScrollSpeed = BASE_SCROLL_SPEED + (level - 1) * 0.8;\
-                triggerLevelUpEffect();\
-            \}\
-\
-            spawn(); player.update();\
-            platforms.forEach(p => p.x -= currentScrollSpeed);\
-            obstacles.forEach(o => o.update());\
-            enemies.forEach(e => \{\
-                e.update();\
-                const dx = (player.x + 25) - (e.x + e.w/2);\
-                const dy = (player.y + 40) - (e.y + e.h/2);\
-                if (Math.hypot(dx, dy) < (35 + e.w/2)) gameOver("\uc0\u12390 \u12365 \u12395  \u12406 \u12388 \u12363 \u12387 \u12385 \u12419 \u12387 \u12383 \u65281 ");\
-            \});\
-            boxes.forEach(b => b.update());\
-            coins.forEach(c => \{\
-                c.update();\
-                if (!c.collected && Math.hypot(player.x+25 - c.x, player.y+40 - c.y) < 42) \{\
-                    c.collected = true; score += 100; scoreEl.innerText = score;\
-                    playSfx(1046, 'sine', 0.12, 0.08, 523);\
-                    for(let i=0; i<8; i++) particles.push(new Particle(c.x, c.y, '#f1c40f'));\
-                \}\
-            \});\
-            particles.forEach(p => p.update());\
-            popups.forEach(p => p.update());\
-            clouds.forEach(c => \{ c.x -= currentScrollSpeed * 0.3; if (c.x < -200) c.x = CANVAS_WIDTH + 100; \});\
-\
-            platforms = platforms.filter(p => p.x + p.w > -100);\
-            enemies = enemies.filter(e => e.x > -200);\
-            obstacles = obstacles.filter(o => o.x > -100);\
-            boxes = boxes.filter(b => b.x > -100);\
-            coins = coins.filter(c => c.x > -100 && !c.collected);\
-            particles = particles.filter(p => p.life > 0);\
-            popups = popups.filter(p => p.life > 0);\
-        \}\
-\
-        function draw() \{\
-            ctx.clearRect(0,0,CANVAS_WIDTH,CANVAS_HEIGHT);\
-            const skyGrad = ctx.createLinearGradient(0,0,0,CANVAS_HEIGHT);\
-            skyGrad.addColorStop(0, '#4facfe'); skyGrad.addColorStop(1, '#00f2fe');\
-            ctx.fillStyle = skyGrad; ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);\
-            clouds.forEach(c => \{\
-                ctx.fillStyle = "rgba(255,255,255,0.7)";\
-                ctx.beginPath(); ctx.arc(c.x, c.y, 25*c.s, 0, Math.PI*2); ctx.arc(c.x+25*c.s, c.y-10*c.s, 30*c.s, 0, Math.PI*2); ctx.arc(c.x+55*c.s, c.y, 25*c.s, 0, Math.PI*2); ctx.fill();\
-            \});\
-            platforms.forEach(p => p.draw());\
-            boxes.forEach(b => b.draw());\
-            obstacles.forEach(o => o.draw());\
-            coins.forEach(c => c.draw());\
-            enemies.forEach(e => e.draw());\
-            particles.forEach(p => p.draw());\
-            popups.forEach(p => p.draw());\
-            player.draw();\
-        \}\
-\
-        function gameLoop() \{ update(); draw(); requestAnimationFrame(gameLoop); \}\
-\
-        function gameOver(reason) \{\
-            if (gameState === 'over') return; gameState = 'over';\
-            deathReasonEl.innerText = reason;\
-            playSfx(150, 'sawtooth', 0.6, 0.2, -100);\
-            if (score > hiScore) \{ hiScore = score; localStorage.setItem('deer_hiscore_v6', hiScore); hiScoreEl.innerText = hiScore; \}\
-            finalScoreEl.innerText = score; \
-            gameOverEl.style.display = 'block';\
-        \}\
-\
-        function resetGame() \{\
-            score = 0; distance = 0; frames = 0; level = 1; currentScrollSpeed = BASE_SCROLL_SPEED;\
-            bgmTempo = 250;\
-            platforms = [new Platform(0, 1000)]; enemies = []; boxes = []; coins = []; particles = []; popups = []; obstacles = [];\
-            player = new DeerPlayer();\
-            scoreEl.innerText = '0'; levelEl.innerText = '1'; gameState = 'playing'; \
-            gameOverEl.style.display = 'none';\
-            startBgm();\
-        \}\
-\
-        function handleInput() \{\
-            if (audioCtx.state === 'suspended') audioCtx.resume();\
-            if (gameState === 'playing' && player.jumpCount < 2) \{\
-                player.dy = JUMP_FORCE; player.jumpCount++;\
-                playSfx(523 + (player.jumpCount * 150), 'sine', 0.15, 0.1, 250);\
-            \}\
-        \}\
-\
-        window.addEventListener('keydown', e => \{ if (e.code === 'Space' || e.code === 'ArrowUp') handleInput(); \});\
-        canvas.addEventListener('mousedown', handleInput);\
-        canvas.addEventListener('touchstart', e => \{ e.preventDefault(); handleInput(); \});\
-        jumpBtn.addEventListener('mousedown', (e) => \{ e.stopPropagation(); handleInput(); \});\
-        jumpBtn.addEventListener('touchstart', (e) => \{ e.preventDefault(); e.stopPropagation(); handleInput(); \});\
-        window.onload = () => \{ startBgm(); gameLoop(); \};\
-    </script>\
-</body>\
-</html>\
-                if (gameState === 'playing') \{\
-                    playNote(}
+    <div id="ui-overlay">
+        <div>SCORE: <span id="score" class="font-bold">0</span></div>
+        <div>BEST: <span id="hi-score" class="opacity-80">0</span></div>
+        <div>DIST: <span id="dist">0</span>m</div>
+    </div>
+
+    <div id="jump-button">JUMP</div>
+
+    <div id="level-up-banner">LEVEL UP!</div>
+    <div id="level-indicator">LEVEL: <span id="current-level">1</span></div>
+
+    <div id="game-over">
+        <h1 style="font-size: 36px; color: #ff4757; margin-bottom: 10px; font-weight: 900;">GAME OVER</h1>
+        <p id="death-reason" style="font-size: 18px; color: #555; margin-bottom: 20px;"></p>
+        <div style="background: #f1f2f6; padding: 20px; border-radius: 20px; margin-bottom: 10px;">
+            <p style="font-size: 20px; margin: 0; color: #2f3542;">今回のスコア</p>
+            <p id="final-score" style="font-size: 42px; font-weight:900; color:#ff9f43; margin: 5px 0;">0</p>
+        </div>
+        <button class="btn-retry" onclick="resetGame()">もういちど挑戦！</button>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreEl = document.getElementById('score');
+        const hiScoreEl = document.getElementById('hi-score');
+        const distEl = document.getElementById('dist');
+        const levelEl = document.getElementById('current-level');
+        const gameOverEl = document.getElementById('game-over');
+        const finalScoreEl = document.getElementById('final-score');
+        const deathReasonEl = document.getElementById('death-reason');
+        const levelBanner = document.getElementById('level-up-banner');
+        const jumpBtn = document.getElementById('jump-button');
+
+        const GRAVITY = 0.6;
+        const JUMP_FORCE = -12.5;
+        const BASE_SCROLL_SPEED = 6.5; // 初速を少しアップ (6.0 -> 6.5)
+        const CANVAS_WIDTH = 800;
+        const CANVAS_HEIGHT = 450;
+        const GROUND_Y = CANVAS_HEIGHT - 65;
+
+        canvas.width = CANVAS_WIDTH;
+        canvas.height = CANVAS_HEIGHT;
+
+        let gameState = 'playing';
+        let score = 0;
+        let distance = 0;
+        let frames = 0;
+        let level = 1;
+        let currentScrollSpeed = BASE_SCROLL_SPEED;
+        let hiScore = localStorage.getItem('deer_hiscore_v6') || 0;
+        hiScoreEl.innerText = hiScore;
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let bgmInterval;
+        let bgmTempo = 250; 
+
+        function playNote(freq, dur, vol = 0.05, type = 'triangle') {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + dur);
+        }
+
+        const melody = [261.63, 293.66, 329.63, 349.23, 392.00, 329.63, 261.63, 392.00];
+        let noteIndex = 0;
+
+        function startBgm() {
+            if (bgmInterval) clearInterval(bgmInterval);
+            bgmInterval = setInterval(() => {
+                if (gameState === 'playing') {
+                    playNote(melody[noteIndex % melody.length], 0.2, 0.03);
+                    if (noteIndex % 4 === 0) playNote(130.81, 0.1, 0.02, 'square'); 
+                    noteIndex++;
+                }
+            }, bgmTempo);
+        }
+
+        function playSfx(freq, type, dur, vol = 0.1, slide = 0) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            if (slide) osc.frequency.exponentialRampToValueAtTime(freq + slide, audioCtx.currentTime + dur);
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + dur);
+        }
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x; this.y = y; this.vx = (Math.random()-0.5)*10; this.vy = (Math.random()-0.5)*10;
+                this.life = 1.0; this.color = color; this.size = Math.random()*5+2;
+            }
+            update() { this.x += this.vx; this.y += this.vy; this.life -= 0.03; }
+            draw() {
+                ctx.save(); ctx.globalAlpha = this.life; ctx.fillStyle = this.color;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill(); ctx.restore();
+            }
+        }
+
+        class ItemPopup {
+            constructor(x, y, type, points) {
+                this.x = x; this.y = y; this.type = type; this.points = points;
+                this.vy = -6; this.life = 1.0;
+                this.icons = { candy: '🍬', drink: '🥤', cake: '🍰' };
+            }
+            update() { this.y += this.vy; this.vy += 0.25; this.life -= 0.015; }
+            draw() {
+                ctx.save(); ctx.globalAlpha = this.life;
+                ctx.font = '40px Arial';
+                ctx.textAlign = 'center'; 
+                ctx.fillText(this.icons[this.type], this.x, this.y);
+                ctx.font = 'bold 24px Outfit';
+                ctx.fillStyle = '#ff9f43';
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 3;
+                ctx.strokeText(`+${this.points}`, this.x, this.y - 45);
+                ctx.fillText(`+${this.points}`, this.x, this.y - 45);
+                ctx.restore();
+            }
+        }
+
+        class Platform {
+            constructor(x, w) { this.x = x; this.w = w; }
+            draw() {
+                const grad = ctx.createLinearGradient(this.x, GROUND_Y, this.x, GROUND_Y+65);
+                grad.addColorStop(0, '#2ecc71'); grad.addColorStop(1, '#1e8449');
+                ctx.fillStyle = grad;
+                ctx.beginPath(); ctx.roundRect(this.x, GROUND_Y, this.w, 100, [10, 10, 0, 0]); ctx.fill();
+                ctx.fillStyle = 'rgba(0,0,0,0.05)';
+                for(let i=0; i<this.w; i+=40) ctx.fillRect(this.x+i, GROUND_Y, 20, 5);
+            }
+        }
+
+        class Enemy {
+            constructor(x, type, scale = 1.0, levelAtSpawn = 1) {
+                this.x = x; this.type = type; this.scale = scale;
+                this.w = 45 * scale; this.h = 45 * scale;
+                this.startY = GROUND_Y - this.h - 5; this.y = this.startY;
+                this.angle = 0; this.seed = Math.random() * 100;
+                this.color = this.getColorByLevel(levelAtSpawn);
+            }
+
+            getColorByLevel(lv) {
+                const colors = ['#ff4757', '#ffa502', '#eccc68', '#2ed573', '#1e90ff', '#a55eea', '#2f3542'];
+                return colors[Math.min(lv - 1, colors.length - 1)];
+            }
+
+            update() {
+                this.x -= currentScrollSpeed;
+                this.angle += 0.12;
+
+                if (this.type === 'horizontal') {
+                    this.x -= 3.0;
+                } else if (this.type === 'vertical') {
+                    this.y = this.startY + Math.sin(this.angle) * 80;
+                } else if (this.type === 'diagonal') {
+                    this.y = this.startY + Math.sin(this.angle) * 90;
+                    this.x -= 2.5;
+                } else if (this.type === 'random') {
+                    this.y = this.startY + Math.sin(this.angle + this.seed) * 110;
+                    this.x -= (Math.sin(this.angle * 0.5) * 4.0);
+                }
+            }
+            draw() {
+                ctx.save(); ctx.translate(this.x + this.w/2, this.y + this.h/2);
+                ctx.fillStyle = this.color;
+                ctx.beginPath(); ctx.arc(0, 0, this.w/2, 0, Math.PI*2); ctx.fill();
+                ctx.strokeStyle = this.color; ctx.lineWidth = 4 * this.scale;
+                for(let i=0; i<8; i++) {
+                    const a = (this.angle * 0.6) + (i * Math.PI/4);
+                    ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(Math.cos(a)*(this.w/2+10), Math.sin(a)*(this.w/2+10)); ctx.stroke();
+                }
+                ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(-7*this.scale, -5*this.scale, 8*this.scale, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(7*this.scale, -5*this.scale, 8*this.scale, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = '#000'; const eyeX = Math.cos(this.angle)*2;
+                ctx.beginPath(); ctx.arc((-7+eyeX)*this.scale, -5*this.scale, 4*this.scale, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc((7+eyeX)*this.scale, -5*this.scale, 4*this.scale, 0, Math.PI*2); ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        class Obstacle {
+            constructor(x) {
+                this.x = x; this.w = 50; this.h = 60; this.y = GROUND_Y - this.h;
+                this.type = Math.random() > 0.5 ? 'cactus' : 'rock';
+            }
+            update() { this.x -= currentScrollSpeed; }
+            draw() {
+                ctx.save(); ctx.translate(this.x, this.y);
+                if (this.type === 'cactus') {
+                    ctx.fillStyle = '#27ae60';
+                    ctx.beginPath(); ctx.roundRect(15, 0, 20, 60, 10); ctx.fill();
+                    ctx.beginPath(); ctx.roundRect(0, 20, 15, 10, 5); ctx.fill();
+                    ctx.beginPath(); ctx.roundRect(35, 15, 15, 10, 5); ctx.fill();
+                } else {
+                    ctx.fillStyle = '#7f8c8d';
+                    ctx.beginPath(); ctx.moveTo(0, 60); ctx.lineTo(10, 10); ctx.lineTo(25, 0); ctx.lineTo(40, 20); ctx.lineTo(50, 60); ctx.closePath(); ctx.fill();
+                }
+                ctx.restore();
+            }
+        }
+
+        class Coin {
+            constructor(x, y) { this.x = x; this.y = y; this.collected = false; this.anim = 0; }
+            update() { this.x -= currentScrollSpeed; this.anim += 0.15; }
+            draw() {
+                if (this.collected) return;
+                ctx.save(); ctx.translate(this.x, this.y + Math.sin(this.anim)*6);
+                ctx.scale(Math.cos(this.anim), 1);
+                ctx.fillStyle = '#f1c40f'; ctx.beginPath(); ctx.arc(0, 0, 15, 0, Math.PI*2); ctx.fill();
+                ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+                ctx.fillStyle = '#d4ac0d'; ctx.font = 'bold 18px Arial'; ctx.textAlign = 'center'; ctx.fillText('$', 0, 7);
+                ctx.restore();
+            }
+        }
+
+        class Box {
+            constructor(x, y) { this.x = x; this.y = y; this.w = 48; this.h = 48; this.isUsed = false; this.anim = 0; }
+            update() { this.x -= currentScrollSpeed; if (this.anim < 0) this.anim += 2; }
+            draw() {
+                ctx.save(); ctx.translate(this.x, this.y + this.anim);
+                ctx.fillStyle = this.isUsed ? '#bdc3c7' : '#f1c40f';
+                ctx.beginPath(); ctx.roundRect(0, 0, 48, 48, 10); ctx.fill();
+                ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.stroke();
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 30px Arial'; ctx.textAlign = 'center'; ctx.fillText(this.isUsed ? '×' : '?', 24, 35);
+                ctx.restore();
+            }
+            hit() {
+                if (this.isUsed) return; this.isUsed = true; this.anim = -25;
+                const r = Math.random();
+                let points, type;
+                if (r < 0.5) { points = 200; type = 'candy'; }
+                else if (r < 0.8) { points = 300; type = 'drink'; }
+                else { points = 500; type = 'cake'; }
+                score += points; scoreEl.innerText = score;
+                popups.push(new ItemPopup(this.x + 24, this.y - 10, type, points));
+                playSfx(880, 'square', 0.25, 0.1, 440);
+                for(let i=0; i<20; i++) particles.push(new Particle(this.x+24, this.y+24, '#f1c40f'));
+            }
+        }
+
+        class DeerPlayer {
+            constructor() {
+                this.startPosX = 60;
+                this.x = this.startPosX; this.y = GROUND_Y - 110; 
+                this.w = 55; this.h = 100; 
+                this.dy = 0; this.jumpCount = 0; this.tilt = 0; this.walkCycle = 0;
+                this.headSize = 55;
+            }
+            draw() {
+                ctx.save();
+                const bounce = Math.abs(Math.sin(this.walkCycle)) * 4; 
+                ctx.translate(this.x + this.w/2, this.y + this.h/2 - bounce);
+                ctx.rotate(this.tilt);
+                const legMovement = Math.sin(this.walkCycle) * 18;
+                const armMovement = Math.sin(this.walkCycle) * 14;
+                ctx.strokeStyle = '#f5f6fa'; ctx.lineWidth = 4; ctx.lineCap = 'round';
+                ctx.beginPath(); ctx.moveTo(-12, -35); ctx.quadraticCurveTo(-35, -55, -25, -85); ctx.moveTo(-24, -50); ctx.lineTo(-42, -65); ctx.moveTo(-28, -65); ctx.lineTo(-12, -75); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(12, -35); ctx.quadraticCurveTo(35, -55, 25, -85); ctx.moveTo(24, -50); ctx.lineTo(42, -65); ctx.moveTo(28, -65); ctx.lineTo(12, -75); ctx.stroke();
+                ctx.fillStyle = '#74b9ff'; ctx.strokeStyle = '#000'; ctx.lineWidth = 2.5;
+                ctx.beginPath(); ctx.roundRect(-18 + legMovement * 0.5, 25 + legMovement, 12, 20, 6); ctx.fill(); ctx.stroke();
+                ctx.beginPath(); ctx.roundRect(8 - legMovement * 0.5, 25 - legMovement, 12, 20, 6); ctx.fill(); ctx.stroke();
+                ctx.beginPath(); ctx.roundRect(-18, 0, 36, 30, 15); ctx.fill(); ctx.stroke();
+                ctx.beginPath(); ctx.ellipse(-15 - armMovement * 0.3, 15 + armMovement, 6, 12, 0.2, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+                ctx.beginPath(); ctx.ellipse(15 + armMovement * 0.3, 15 - armMovement, 6, 12, -0.2, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+                ctx.beginPath(); ctx.arc(-15, 20, 7, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                ctx.save(); ctx.translate(0, -25); ctx.beginPath(); ctx.roundRect(-this.headSize/2, -this.headSize/2, this.headSize, this.headSize, 22); ctx.fill(); ctx.stroke();
+                ctx.save(); ctx.translate(-22, -22); ctx.rotate(0.3); ctx.beginPath(); ctx.ellipse(0, 0, 12, 7, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.moveTo(-5, 0); ctx.lineTo(5, 0); ctx.stroke(); ctx.restore();
+                ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.ellipse(20, 5, 18, 15, -Math.PI * 0.1, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(32, 5, 5, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(-8, -5, 12, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(-5, -5, 6, 0, Math.PI * 2); ctx.fill();
+                ctx.restore(); ctx.restore(); 
+            }
+            update() {
+                this.dy += GRAVITY; this.y += this.dy;
+                if (this.dy === 0) { this.walkCycle += 0.28; } else { this.walkCycle += 0.05; }
+                this.tilt = this.dy * 0.04;
+                if (this.x < this.startPosX) { this.x += 1.5; }
+
+                platforms.forEach(p => {
+                    if (this.x + this.w > p.x && this.x < p.x + p.w && this.y + this.h > GROUND_Y && this.y + this.h - this.dy <= GROUND_Y + 20) {
+                        this.y = GROUND_Y - this.h; this.dy = 0; this.jumpCount = 0;
+                    }
+                });
+
+                boxes.forEach(b => {
+                    const boxLeft = b.x; const boxRight = b.x + b.w;
+                    const boxTop = b.y; const boxBottom = b.y + b.h;
+                    if (this.x + this.w > boxLeft && this.x < boxRight && this.y + this.h > boxTop && this.y < boxBottom) {
+                        if (this.dy > 0 && this.y + this.h - this.dy <= boxTop + 10) {
+                            this.y = boxTop - this.h; this.dy = 0; this.jumpCount = 0;
+                        } 
+                        else if (this.dy < 0 && this.y - this.dy >= boxBottom - 10) {
+                            this.y = boxBottom; this.dy = 2; b.hit();
+                        }
+                        else {
+                            if (this.x + this.w - currentScrollSpeed <= boxLeft + 15) { this.x = boxLeft - this.w; }
+                            else if (this.x >= boxRight - 15) { this.x = boxRight; }
+                        }
+                    }
+                });
+
+                obstacles.forEach(o => {
+                    if (this.x + this.w > o.x + 10 && this.x < o.x + o.w - 10 && this.y + this.h > o.y + 10 && this.y < o.y + o.h) {
+                        gameOver("とげとげに ささっちゃった！");
+                    }
+                });
+
+                if (this.x < -10) { gameOver("おしだされて 画面からはみだしちゃった！"); }
+                else if (this.x < 10) { this.x += 2; }
+                if (this.y > CANVAS_HEIGHT) gameOver("あなに おっこちた！");
+            }
+        }
+
+        let player = new DeerPlayer();
+        let platforms = [new Platform(0, 1000)];
+        let enemies = []; let boxes = []; let coins = []; let particles = []; let popups = []; let obstacles = [];
+        let clouds = Array.from({length: 6}, () => ({ x: Math.random()*900, y: 30+Math.random()*100, s: 0.8+Math.random() }));
+
+        function spawn() {
+            if (frames % 70 === 0) { // スポーン間隔を少し短縮 (80 -> 70)
+                const last = platforms[platforms.length - 1];
+                const gapProb = 0.5; // 穴が開く確率を微増 (0.45 -> 0.5)
+                const gapSize = Math.random() < gapProb ? (170 + Math.random() * (120 + level * 10)) : 0;
+                const nextW = 400 + Math.random() * 350;
+                const nextX = last.x + last.w + gapSize;
+                platforms.push(new Platform(nextX, nextW));
+
+                if (gapSize === 0) {
+                    // 敵の出現率を大幅アップ (0.5 -> 0.75)
+                    if (Math.random() < 0.75) {
+                        let eType = 'static';
+                        if (level === 2) eType = 'horizontal';
+                        else if (level === 3) eType = 'vertical';
+                        else if (level === 4) eType = 'diagonal';
+                        else if (level === 5) eType = 'random';
+                        else if (level >= 6) {
+                            const types = ['static', 'horizontal', 'vertical', 'diagonal', 'random'];
+                            eType = types[Math.floor(Math.random() * types.length)];
+                        }
+                        const enemyScale = 1.0 + Math.min(1.0, (level - 1) * 0.1); 
+                        enemies.push(new Enemy(nextX + 300, eType, enemyScale, level));
+                    } 
+                    // 障害物の出現率をアップ (0.3 -> 0.45)
+                    if (Math.random() < 0.45) {
+                        obstacles.push(new Obstacle(nextX + 150));
+                    }
+                    // アイテムボックスの出現率をアップ (0.4 -> 0.6)
+                    if (Math.random() < 0.6) {
+                        boxes.push(new Box(nextX + 250, GROUND_Y - 180));
+                    }
+                    // コインの出現率をアップ (0.6 -> 0.8)
+                    if (Math.random() < 0.8) {
+                        const count = 4 + Math.floor(Math.random()*5); // 枚数も微増
+                        const startX = nextX + 100;
+                        for(let i=0; i<count; i++) {
+                            coins.push(new Coin(startX + i*45, GROUND_Y - 120 - Math.sin(i*0.8)*40));
+                        }
+                    }
+                } else {
+                    // 穴がある場合でも、空中や端にコインを出すようにして誘導
+                    if (Math.random() < 0.7) {
+                        coins.push(new Coin(nextX - gapSize/2, GROUND_Y - 150));
+                    }
+                }
+            }
+        }
+
+        function triggerLevelUpEffect() {
+            levelBanner.style.transform = "translate(-50%, -50%) scale(1.2)";
+            setTimeout(() => { levelBanner.style.transform = "translate(-50%, -50%) scale(0)"; }, 1500);
+            playSfx(659, 'sine', 0.5, 0.1, 330);
+            bgmTempo = Math.max(100, 250 - (level - 1) * 15);
+            startBgm(); 
+        }
+
+        function update() {
+            if (gameState !== 'playing') return;
+            frames++; distance = Math.floor(frames / 8); distEl.innerText = distance;
+
+            const newLevel = Math.floor(score / 5000) + 1;
+            if (newLevel !== level) {
+                level = newLevel; levelEl.innerText = level;
+                currentScrollSpeed = BASE_SCROLL_SPEED + (level - 1) * 0.8;
+                triggerLevelUpEffect();
+            }
+
+            spawn(); player.update();
+            platforms.forEach(p => p.x -= currentScrollSpeed);
+            obstacles.forEach(o => o.update());
+            enemies.forEach(e => {
+                e.update();
+                const dx = (player.x + 25) - (e.x + e.w/2);
+                const dy = (player.y + 40) - (e.y + e.h/2);
+                if (Math.hypot(dx, dy) < (35 + e.w/2)) gameOver("てきに ぶつかっちゃった！");
+            });
+            boxes.forEach(b => b.update());
+            coins.forEach(c => {
+                c.update();
+                if (!c.collected && Math.hypot(player.x+25 - c.x, player.y+40 - c.y) < 42) {
+                    c.collected = true; score += 100; scoreEl.innerText = score;
+                    playSfx(1046, 'sine', 0.12, 0.08, 523);
+                    for(let i=0; i<8; i++) particles.push(new Particle(c.x, c.y, '#f1c40f'));
+                }
+            });
+            particles.forEach(p => p.update());
+            popups.forEach(p => p.update());
+            clouds.forEach(c => { c.x -= currentScrollSpeed * 0.3; if (c.x < -200) c.x = CANVAS_WIDTH + 100; });
+
+            platforms = platforms.filter(p => p.x + p.w > -100);
+            enemies = enemies.filter(e => e.x > -200);
+            obstacles = obstacles.filter(o => o.x > -100);
+            boxes = boxes.filter(b => b.x > -100);
+            coins = coins.filter(c => c.x > -100 && !c.collected);
+            particles = particles.filter(p => p.life > 0);
+            popups = popups.filter(p => p.life > 0);
+        }
+
+        function draw() {
+            ctx.clearRect(0,0,CANVAS_WIDTH,CANVAS_HEIGHT);
+            const skyGrad = ctx.createLinearGradient(0,0,0,CANVAS_HEIGHT);
+            skyGrad.addColorStop(0, '#4facfe'); skyGrad.addColorStop(1, '#00f2fe');
+            ctx.fillStyle = skyGrad; ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+            clouds.forEach(c => {
+                ctx.fillStyle = "rgba(255,255,255,0.7)";
+                ctx.beginPath(); ctx.arc(c.x, c.y, 25*c.s, 0, Math.PI*2); ctx.arc(c.x+25*c.s, c.y-10*c.s, 30*c.s, 0, Math.PI*2); ctx.arc(c.x+55*c.s, c.y, 25*c.s, 0, Math.PI*2); ctx.fill();
+            });
+            platforms.forEach(p => p.draw());
+            boxes.forEach(b => b.draw());
+            obstacles.forEach(o => o.draw());
+            coins.forEach(c => c.draw());
+            enemies.forEach(e => e.draw());
+            particles.forEach(p => p.draw());
+            popups.forEach(p => p.draw());
+            player.draw();
+        }
+
+        function gameLoop() { update(); draw(); requestAnimationFrame(gameLoop); }
+
+        function gameOver(reason) {
+            if (gameState === 'over') return; gameState = 'over';
+            deathReasonEl.innerText = reason;
+            playSfx(150, 'sawtooth', 0.6, 0.2, -100);
+            if (score > hiScore) { hiScore = score; localStorage.setItem('deer_hiscore_v6', hiScore); hiScoreEl.innerText = hiScore; }
+            finalScoreEl.innerText = score; 
+            gameOverEl.style.display = 'block';
+        }
+
+        function resetGame() {
+            score = 0; distance = 0; frames = 0; level = 1; currentScrollSpeed = BASE_SCROLL_SPEED;
+            bgmTempo = 250;
+            platforms = [new Platform(0, 1000)]; enemies = []; boxes = []; coins = []; particles = []; popups = []; obstacles = [];
+            player = new DeerPlayer();
+            scoreEl.innerText = '0'; levelEl.innerText = '1'; gameState = 'playing'; 
+            gameOverEl.style.display = 'none';
+            startBgm();
+        }
+
+        function handleInput() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            if (gameState === 'playing' && player.jumpCount < 2) {
+                player.dy = JUMP_FORCE; player.jumpCount++;
+                playSfx(523 + (player.jumpCount * 150), 'sine', 0.15, 0.1, 250);
+            }
+        }
+
+        window.addEventListener('keydown', e => { if (e.code === 'Space' || e.code === 'ArrowUp') handleInput(); });
+        canvas.addEventListener('mousedown', handleInput);
+        canvas.addEventListener('touchstart', e => { e.preventDefault(); handleInput(); });
+        jumpBtn.addEventListener('mousedown', (e) => { e.stopPropagation(); handleInput(); });
+        jumpBtn.addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); handleInput(); });
+        window.onload = () => { startBgm(); gameLoop(); };
+    </script>
+</body>
+</html>
